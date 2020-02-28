@@ -20,7 +20,7 @@ import org.apache.solr.client.solrj.impl.CloudSolrClient.Builder;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 
-public class SolrSearch {
+public class SolrFeatureGenerator {
 
 	public static void main(String[] args) throws SolrServerException, IOException {
 		String searchPropertiesFilename = args[0];
