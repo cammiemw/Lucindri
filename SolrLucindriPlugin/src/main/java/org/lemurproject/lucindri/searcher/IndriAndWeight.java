@@ -36,7 +36,7 @@ public class IndriAndWeight extends IndriWeight {
 		this.scoreMode = scoreMode;
 		weights = new ArrayList<>();
 		for (BooleanClause c : query) {
-			Weight w = searcher.createWeight(c.getQuery(), scoreMode, boost);
+			Weight w = searcher.createWeight(c.getQuery(), scoreMode, 1.0f);
 			weights.add(w);
 		}
 	}
@@ -56,7 +56,7 @@ public class IndriAndWeight extends IndriWeight {
 		}
 		Scorer scorer = subScorers.get(0);
 		if (subScorers.size() > 1) {
-			scorer = new IndriAndScorer(this, subScorers, scoreMode, this.boost);
+			scorer = new IndriAndScorer(this, subScorers, scoreMode, boost);
 		}
 		return scorer;
 	}

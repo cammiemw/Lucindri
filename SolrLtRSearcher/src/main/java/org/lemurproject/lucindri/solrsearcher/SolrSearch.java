@@ -72,6 +72,8 @@ public class SolrSearch {
 //			query.set("rq", String.join("", "{!ltr model=", searchProps.getLtrModel(), " efi.text=", queryString, "}"));
 			query.set("fl", String.join("", "id,url,score,[features store=", searchProps.getFeatureStore(),
 					" efi.text=", queryString, "]"));
+			query.set("h1", "on");
+			query.set("h1.fl", "fulltext");
 			query.setSort("score", ORDER.desc);
 			query.setRows(Integer.valueOf(100));
 			// query.setFields("fulltext");
@@ -80,6 +82,7 @@ public class SolrSearch {
 
 			QueryResponse response = solrClient.query(query);
 			SolrDocumentList results = response.getResults();
+			Map<String, Map<String, List<String>>> highlightsMap = response.getHighlighting();
 			Map<String, Map<String, Double>> docFeatureValueMap = new HashMap<String, Map<String, Double>>();
 			for (int i = 0; i < results.size(); ++i) {
 				String docId = (String) results.get(i).get("id");

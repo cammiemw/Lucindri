@@ -35,7 +35,7 @@ public class IndriMaxWeight extends IndriWeight {
 		this.scoreMode = scoreMode;
 		weights = new ArrayList<>();
 		for (BooleanClause c : query) {
-			Weight w = searcher.createWeight(c.getQuery(), scoreMode, boost);
+			Weight w = searcher.createWeight(c.getQuery(), scoreMode, 1.0f);
 			weights.add(w);
 		}
 	}

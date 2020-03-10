@@ -9,13 +9,15 @@
  *
  * ================================================================================================
  */
-package org.apache.lucene.search.similarities;
+package org.lemurproject.lucindri.searcher.similarities;
 
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.similarities.IndriSimilarity.IndriStats;
+import org.apache.lucene.search.similarities.BasicStats;
+import org.apache.lucene.search.similarities.LMSimilarity;
+import org.lemurproject.lucindri.searcher.similarities.IndriSimilarity.IndriStats;
 
 /**
  */

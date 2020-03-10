@@ -32,13 +32,13 @@ public class IndriNotWeight extends IndriWeight {
 		this.boost = boost;
 		// Not Query only has one clause
 		BooleanClause c = query.iterator().next();
-		weight = searcher.createWeight(c.getQuery(), scoreMode, boost);
+		weight = searcher.createWeight(c.getQuery(), scoreMode, 1.0f);
 	}
 
 	private Scorer getScorer(LeafReaderContext context) throws IOException {
 		Scorer scorer = weight.scorer(context);
 		if (scorer != null) {
-			Scorer scorerWrapper = new IndriNotScorer(this, scorer);
+			Scorer scorerWrapper = new IndriNotScorer(this, scorer, boost);
 			return scorerWrapper;
 		}
 		return null;

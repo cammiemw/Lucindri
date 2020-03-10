@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.lemurproject.lucindri</groupId>
-	<artifactId>SolrSearcher</artifactId>
+	<artifactId>SolrFeatureGenerator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
@@ -33,7 +33,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>org.lemurproject.lucindri.solrsearcher.SolrSearch</mainClass>
+							<mainClass>org.lemurproject.lucindri.solrsearcher.SolrFeatureGenerator</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

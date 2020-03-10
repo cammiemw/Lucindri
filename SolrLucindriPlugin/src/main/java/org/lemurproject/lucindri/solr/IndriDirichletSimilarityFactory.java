@@ -1,9 +1,9 @@
 package org.lemurproject.lucindri.solr;
 
-import org.apache.lucene.search.similarities.IndriDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.schema.SimilarityFactory;
+import org.lemurproject.lucindri.searcher.similarities.IndriDirichletSimilarity;
 
 public class IndriDirichletSimilarityFactory extends SimilarityFactory {
 

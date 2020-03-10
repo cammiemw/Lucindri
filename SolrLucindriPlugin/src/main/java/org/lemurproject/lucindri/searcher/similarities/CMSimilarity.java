@@ -1,4 +1,4 @@
-package org.apache.lucene.search.similarities;
+package org.lemurproject.lucindri.searcher.similarities;
 
 import org.apache.lucene.search.similarities.BasicStats;
 import org.apache.lucene.search.similarities.LMDirichletSimilarity;

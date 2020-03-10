@@ -38,6 +38,7 @@ public class ClueWeb09DocumentParser extends DocumentParser {
 	private final static String URL_FIELD = "url";
 	private final static String URL_DEPTH_FIELD = "urldepth";
 	private final static String URL_WIKIPEDIA_FIELD = "wikipedia";
+	private final static String HTML = "html";
 
 	private static final byte MASK_THREE_BYTE_CHAR = (byte) (0xE0);
 	private static final byte MASK_TWO_BYTE_CHAR = (byte) (0xC0);

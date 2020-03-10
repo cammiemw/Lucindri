@@ -69,8 +69,7 @@ public class SolrFeatureGenerator {
 
 			query.setQuery(queryBuffer.toString());
 			queryTextMap.put(queryNumber, queryLine);
-			// String SDMquery = createSDMQueries(queryString).trim();
-			String SDMquery = String.join("", "~or(", queryString, ")");
+			String SDMquery = createSDMQueries(queryString).trim();
 			System.out.println(SDMquery);
 			query.set("fl", String.join("", "id,url,score,[features store=", searchProps.getFeatureStore(),
 					" efi.text='", queryString, "' efi.text_sdm='", SDMquery, "']"));
@@ -169,31 +168,29 @@ public class SolrFeatureGenerator {
 
 			// Create SDM query
 			StringJoiner queryBuffer = new StringJoiner("");
-//			queryBuffer.add("~wsum("); // begin query
-//
-//			queryBuffer.add(String.join("", "0.7 ~and(", queryString, ")"));
+			queryBuffer.add("~wsum("); // begin query
+
+			queryBuffer.add(String.join("", "0.7 ~and(", queryString, ")"));
 
 			// nears
-			// queryBuffer.add(" 0.2 ~and(");
-//			queryBuffer.add(" ~wand(");
-//			for (int i = 0; i < queryWordArray.length - 1; i++) {
-//				// for (int i = 0; i < 1; i++) {
-//				String bigram = String.join(" ", queryWordArray[i], queryWordArray[i + 1]);
-//				queryBuffer.add(String.join("", " 1.0 ~1(", bigram, ")"));
-//
-//			}
-//			queryBuffer.add(")");
+			queryBuffer.add(" 0.2 ~and(");
+			for (int i = 0; i < queryWordArray.length - 1; i++) {
+				String bigram = String.join(" ", queryWordArray[i], queryWordArray[i + 1]);
+				queryBuffer.add(String.join("", " 1.0 ~1(", bigram, ")"));
 
-//			// windows
-//			queryBuffer.add(" 0.1 ~and(");
-//			for (int i = 0; i < queryWordArray.length - 1; i++) {
-//				String bigram = String.join(" ", queryWordArray[i], queryWordArray[i + 1]);
-//				queryBuffer.add(String.join("", " ~uw8(", bigram, ")"));
-//
-//			}
-//			queryBuffer.add(")");
+			}
+			queryBuffer.add(")");
 
-//			queryBuffer.add(")"); // end query
+			// windows
+			queryBuffer.add(" 0.1 ~and(");
+			for (int i = 0; i < queryWordArray.length - 1; i++) {
+				String bigram = String.join(" ", queryWordArray[i], queryWordArray[i + 1]);
+				queryBuffer.add(String.join("", " ~uw8(", bigram, ")"));
+
+			}
+			queryBuffer.add(")");
+
+			queryBuffer.add(")"); // end query
 
 			SDMquery = queryBuffer.toString();
 		}

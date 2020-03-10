@@ -9,7 +9,7 @@
  *
  * ================================================================================================
  */
-package org.apache.lucene.search;
+package org.lemurproject.lucindri.searcher;
 
 import java.io.IOException;
 
@@ -17,6 +17,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.Terms;
+import org.apache.lucene.search.CollectionStatistics;
+import org.apache.lucene.search.IndexSearcher;
 
 public class IndriIndexSearcher extends IndexSearcher {
 
@@ -32,7 +34,7 @@ public class IndriIndexSearcher extends IndexSearcher {
 			long docCount = 0;
 			long sumTotalTermFreq = 0;
 			long sumDocFreq = 0;
-			for (LeafReaderContext leaf : reader.leaves()) {
+			for (LeafReaderContext leaf : getIndexReader().leaves()) {
 				final Terms terms = leaf.reader().terms(field);
 				if (terms == null) {
 					continue;
@@ -64,8 +66,8 @@ public class IndriIndexSearcher extends IndexSearcher {
 			if (docCount == 0) {
 				return null;
 			}
-			collectionStatistics = new CollectionStatistics(field, reader.maxDoc(), docCount, sumTotalTermFreq,
-					sumDocFreq);
+			collectionStatistics = new CollectionStatistics(field, getIndexReader().maxDoc(), docCount,
+					sumTotalTermFreq, sumDocFreq);
 		}
 		return collectionStatistics;
 	}

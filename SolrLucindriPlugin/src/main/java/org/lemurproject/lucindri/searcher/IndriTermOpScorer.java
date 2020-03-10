@@ -23,11 +23,13 @@ public class IndriTermOpScorer extends Scorer implements SmoothingScorer, Weight
 
 	private final IndriTermOpEnum postingsEnum;
 	private final LeafSimScorer docScorer;
+	private final float boost;
 
-	protected IndriTermOpScorer(Weight weight, IndriTermOpEnum postingsEnum, LeafSimScorer docScorer) {
+	protected IndriTermOpScorer(Weight weight, IndriTermOpEnum postingsEnum, LeafSimScorer docScorer, float boost) {
 		super(weight);
 		this.docScorer = docScorer;
 		this.postingsEnum = postingsEnum;
+		this.boost = boost;
 	}
 
 	@Override
@@ -58,8 +60,7 @@ public class IndriTermOpScorer extends Scorer implements SmoothingScorer, Weight
 
 	@Override
 	public float getBoost() {
-		// TODO Auto-generated method stub
-		return 0;
+		return boost;
 	}
 
 	@Override

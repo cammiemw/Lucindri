@@ -47,7 +47,7 @@ public abstract class IndriTermOpWeight extends IndriWeight {
 		collectionStats = searcher.collectionStatistics(field);
 		weights = new ArrayList<>();
 		for (BooleanClause c : query) {
-			Weight w = searcher.createWeight(c.getQuery(), scoreMode, boost);
+			Weight w = searcher.createWeight(c.getQuery(), scoreMode, 1.0f);
 			weights.add(w);
 		}
 	}
@@ -77,7 +77,7 @@ public abstract class IndriTermOpWeight extends IndriWeight {
 		if (termStats != null) {
 			this.simScorer = similarity.scorer(boost, collectionStats, termStats);
 			LeafSimScorer leafScorer = new LeafSimScorer(simScorer, context.reader(), field, true);
-			scorer = new IndriTermOpScorer(this, postingsEnum, leafScorer);
+			scorer = new IndriTermOpScorer(this, postingsEnum, leafScorer, boost);
 		}
 		return scorer;
 	}

@@ -9,7 +9,7 @@
  *
  * ================================================================================================
  */
-package org.apache.lucene.search.similarities;
+package org.lemurproject.lucindri.searcher.similarities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +21,9 @@ import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.search.CollectionStatistics;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.TermStatistics;
+import org.apache.lucene.search.similarities.BasicStats;
+import org.apache.lucene.search.similarities.Similarity;
+import org.apache.lucene.search.similarities.SimilarityBase;
 import org.apache.lucene.util.SmallFloat;
 
 public abstract class IndriSimilarity extends Similarity {
@@ -108,7 +111,7 @@ public abstract class IndriSimilarity extends Similarity {
 		if (weights.length == 1) {
 			return weights[0];
 		} else {
-			return new MultiSimilarity.MultiSimScorer(weights);
+			return new MultiSimScorer(weights);
 		}
 	}
 
@@ -220,6 +223,33 @@ public abstract class IndriSimilarity extends Similarity {
 		@Override
 		public Explanation explain(Explanation freq, long norm) {
 			return IndriSimilarity.this.explain(stats, freq, getLengthValue(norm));
+		}
+
+	}
+
+	static class MultiSimScorer extends SimScorer {
+		private final SimScorer subScorers[];
+
+		MultiSimScorer(SimScorer subScorers[]) {
+			this.subScorers = subScorers;
+		}
+
+		@Override
+		public float score(float freq, long norm) {
+			float sum = 0.0f;
+			for (SimScorer subScorer : subScorers) {
+				sum += subScorer.score(freq, norm);
+			}
+			return sum;
+		}
+
+		@Override
+		public Explanation explain(Explanation freq, long norm) {
+			List<Explanation> subs = new ArrayList<>();
+			for (SimScorer subScorer : subScorers) {
+				subs.add(subScorer.explain(freq, norm));
+			}
+			return Explanation.match(score(freq.getValue().floatValue(), norm), "sum of:", subs);
 		}
 
 	}

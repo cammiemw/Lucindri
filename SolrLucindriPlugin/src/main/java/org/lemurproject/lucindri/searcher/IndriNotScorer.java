@@ -18,12 +18,14 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
 
-public class IndriNotScorer extends Scorer implements SmoothingScorer {
+public class IndriNotScorer extends Scorer implements WeightedScorer, SmoothingScorer {
 	private Scorer subScorer;
+	private final float boost;
 
-	protected IndriNotScorer(Weight weight, Scorer subScorer) {
+	protected IndriNotScorer(Weight weight, Scorer subScorer, float boost) {
 		super(weight);
 		this.subScorer = subScorer;
+		this.boost = boost;
 	}
 
 	@Override
@@ -62,6 +64,11 @@ public class IndriNotScorer extends Scorer implements SmoothingScorer {
 	public float getMaxScore(int upTo) throws IOException {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public float getBoost() {
+		return boost;
 	}
 
 }
