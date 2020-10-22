@@ -16,6 +16,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.lemurproject.lucindri.indexer.domain.IndexingConfiguration;
 import org.lemurproject.lucindri.indexer.domain.ParsedDocument;
@@ -25,7 +26,7 @@ import org.xml.sax.SAXException;
 
 public class IndriGov2DocumentParser extends DocumentParser {
 
-	private final static String EXTERNALID_FIELD = "externalId";
+	private final static String EXTERNALID_FIELD = "id";
 	private final static String ID_FIELD = "internalId";
 	private final static String BODY_FIELD = "body";
 	private final static String TITLE_FIELD = "title";
@@ -105,10 +106,10 @@ public class IndriGov2DocumentParser extends DocumentParser {
 				if (nextLine.startsWith("<DOCNO>")) {
 					docno = nextLine.substring(7, nextLine.length() - 8);
 				}
-				if (nextLine.startsWith("WARC-Target-URI:")) {
-					url = nextLine.split(" ")[1];
-				}
-
+//				if (nextLine.startsWith("WARC-Target-URI:")) {
+//					url = nextLine.split(" ")[1];
+//				}
+//
 				if (nextLine.equals("<DOCHDR>")) {
 					docBuffer = new StringJoiner("");
 					nextLine = br.readLine();
@@ -129,9 +130,9 @@ public class IndriGov2DocumentParser extends DocumentParser {
 					try {
 						Document htmlDoc = Jsoup.parse(docBuffer.toString());
 
-						if (docno == null || docno.length() == 0) {
-							docno = String.valueOf(docNum);
-						}
+//						if (docno == null || docno.length() == 0) {
+//							docno = String.valueOf(docNum);
+//						}
 
 						ParsedDocument doc = new ParsedDocument();
 						doc.setDocumentFields(new ArrayList<ParsedDocumentField>());
@@ -144,8 +145,13 @@ public class IndriGov2DocumentParser extends DocumentParser {
 						doc.getDocumentFields().add(internalIdField);
 
 						if (fieldsToIndex.contains(BODY_FIELD)) {
-							ParsedDocumentField bodyField = new ParsedDocumentField(BODY_FIELD, docBuffer.toString(),
-									false);
+							String body = "";
+							Elements bodyElements = htmlDoc.getElementsByTag("body");
+							if (bodyElements != null && bodyElements.size() > 0) {
+								Element element = bodyElements.get(0);
+								body = Jsoup.clean(element.toString(), Whitelist.none());
+							}
+							ParsedDocumentField bodyField = new ParsedDocumentField(BODY_FIELD, body, false);
 							doc.getDocumentFields().add(bodyField);
 						}
 
@@ -154,7 +160,7 @@ public class IndriGov2DocumentParser extends DocumentParser {
 							Elements titleElements = htmlDoc.getElementsByTag("title");
 							if (titleElements != null && titleElements.size() > 0) {
 								Element element = titleElements.get(0);
-								title = element.toString();
+								title = Jsoup.clean(element.toString(), Whitelist.none());
 							}
 							ParsedDocumentField titleField = new ParsedDocumentField(TITLE_FIELD, title, false);
 							doc.getDocumentFields().add(titleField);
@@ -181,7 +187,7 @@ public class IndriGov2DocumentParser extends DocumentParser {
 						// Index fullText (catch-all) field
 						if (indexFullText) {
 							ParsedDocumentField fullTextField = new ParsedDocumentField(FULLTEXT_FIELD,
-									docBuffer.toString(), false);
+									Jsoup.clean(docBuffer.toString(), Whitelist.none()), false);
 							doc.getDocumentFields().add(fullTextField);
 						}
 

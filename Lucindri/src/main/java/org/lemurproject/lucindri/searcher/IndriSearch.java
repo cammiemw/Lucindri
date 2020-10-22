@@ -25,24 +25,23 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.MultiReader;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.IndriIndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.similarities.IndriDirichletSimilarity;
-import org.apache.lucene.search.similarities.IndriJelinekMercerSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.lemurproject.lucindri.analyzer.EnglishAnalyzerConfigurable;
 import org.lemurproject.lucindri.searcher.domain.JsonIndriQuery;
 import org.lemurproject.lucindri.searcher.domain.JsonIndriQueryWrapper;
-import org.lemurproject.lucindri.searcher.parser.IndriQueryParser;
+import org.lemurproject.lucindri.searcher.similarities.IndriDirichletSimilarity;
+import org.lemurproject.lucindri.searcher.similarities.IndriJelinekMercerSimilarity;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -52,7 +51,8 @@ public class IndriSearch {
 
 	private final static String EXTERNALID_FIELD = "externalId";
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args)
+			throws IOException, ParseException, ParserConfigurationException, SAXException {
 		if (args.length != 1) {
 			System.out.println("Specify parameter file");
 			System.exit(0);
@@ -69,27 +69,10 @@ public class IndriSearch {
 		if (queryWrapper != null) {
 			String indexDir = queryWrapper.getIndex();
 
-			IndexReader reader = null;
-			IndexSearcher searcher = null;
-			if (indexDir.contains(",")) {
-				String[] dirs = indexDir.split(",");
-				IndexReader[] subReaders = new IndexReader[dirs.length];
-				int readerIndex = 0;
-				for (String dirString : dirs) {
-					Directory dir = FSDirectory.open(Paths.get(dirString));
-					IndexReader subReader = DirectoryReader.open(dir);
-					subReaders[readerIndex] = subReader;
-					readerIndex++;
-				}
-				reader = new MultiReader(subReaders, true);
-			} else {
-				Directory dir = FSDirectory.open(Paths.get(indexDir));
-				reader = DirectoryReader.open(dir);
-			}
-			searcher = new IndriIndexSearcher(reader);
-			if (reader == null || searcher == null) {
-				throw new Exception("Index Directory was not properly set");
-			}
+			Directory dir = FSDirectory.open(Paths.get(indexDir));
+			IndexReader reader = DirectoryReader.open(dir);
+			IndexSearcher searcher = new IndriIndexSearcher(reader);
+			// IndexSearcher searcher = new IndexSearcher(reader);
 
 			Similarity similarity = new IndriDirichletSimilarity();
 			if (queryWrapper.getRule() != null) {
@@ -117,8 +100,11 @@ public class IndriSearch {
 			searcher.setSimilarity(similarity);
 
 			for (JsonIndriQuery query : queryWrapper.getQueries()) {
-				IndriQueryParser queryParser = new IndriQueryParser(reader);
-				Query test = queryParser.parseQuery(query.getText());
+				// IndriQueryParser queryParser = new IndriQueryParser();
+				org.apache.lucene.queryparser.classic.QueryParser queryParser = new org.apache.lucene.queryparser.classic.QueryParser(
+						"fulltext", new SimpleAnalyzer());
+				Query test = queryParser.parse(query.getText());
+				// Query test = queryParser.parseQuery(query.getText());
 
 				if (test != null) {
 					TopDocs hitDocs = searcher.search(test, queryWrapper.getCount());

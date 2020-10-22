@@ -56,10 +56,10 @@ public class IndriAndScorer extends IndriDisjunctionScorer implements SmoothingS
 
 	@Override
 	public float smoothingScore(DisiWrapper topList, int docId) throws IOException {
-		DisiWrapper test = getSubMatches();
+		// DisiWrapper test = getSubMatches();
 		double score = 0;
 		double boostSum = 0.0;
-		for (DisiWrapper w = test; w != null; w = w.next) {
+		for (DisiWrapper w = topList; w != null; w = w.next) {
 			int scorerDocId = w.scorer.docID();
 			float boost = 1.0f;
 			if (w.scorer instanceof WeightedScorer) {

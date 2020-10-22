@@ -62,7 +62,8 @@ public class CARDocumentParser extends DocumentParser {
 		ParsedDocumentField internalIdField = new ParsedDocumentField(INTERNALID_FIELD, String.valueOf(docNum), false);
 		doc.getDocumentFields().add(internalIdField);
 
-		ParsedDocumentField externalIdField = new ParsedDocumentField(EXTERNALID_FIELD, p.getParaId(), false);
+		String id = String.join("_", "CAR", p.getParaId());
+		ParsedDocumentField externalIdField = new ParsedDocumentField(EXTERNALID_FIELD, id, false);
 		doc.getDocumentFields().add(externalIdField);
 
 		if (fieldsToIndex.contains(BODY_FIELD)) {

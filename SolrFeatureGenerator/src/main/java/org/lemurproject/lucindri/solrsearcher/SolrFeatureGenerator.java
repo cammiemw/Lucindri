@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.StringJoiner;
 
@@ -54,7 +53,7 @@ public class SolrFeatureGenerator {
 
 		int rank = 1;
 		long totaltime = 0;
-		Map<String, Map<String, Map<String, Double>>> queryDocFeatureValueMap = new HashMap<String, Map<String, Map<String, Double>>>();
+//		Map<String, Map<String, Map<String, Double>>> queryDocFeatureValueMap = new HashMap<String, Map<String, Map<String, Double>>>();
 		while (scanner.hasNext()) {
 			String queryLine = scanner.nextLine();
 			String[] queryParts = queryLine.split(":");
@@ -69,12 +68,14 @@ public class SolrFeatureGenerator {
 
 			query.setQuery(queryBuffer.toString());
 			queryTextMap.put(queryNumber, queryLine);
-			String SDMquery = createSDMQueries(queryString).trim();
-			System.out.println(SDMquery);
+//			String SDMquery = createSDMQueries(queryString).trim();
+//			System.out.println(SDMquery);
+//			query.set("fl", String.join("", "id,url,score,[features store=", searchProps.getFeatureStore(),
+//					" efi.text='", queryString, "' efi.text_sdm='", SDMquery, "']"));
 			query.set("fl", String.join("", "id,url,score,[features store=", searchProps.getFeatureStore(),
-					" efi.text='", queryString, "' efi.text_sdm='", SDMquery, "']"));
+					" efi.text='", queryString, "']"));
 			query.setSort("score", ORDER.desc);
-			query.setRows(Integer.valueOf(100));
+			query.setRows(Integer.valueOf(50));
 			System.out.println(query.toString());
 
 			QueryResponse response = solrClient.query(query);
@@ -101,7 +102,7 @@ public class SolrFeatureGenerator {
 			}
 			fvHelper.writeFeatureVectors(queryNumber, searchProps.getQrelsFileName(), docFeatureValueMap,
 					resultsFVWriter);
-			queryDocFeatureValueMap.put(queryNumber, docFeatureValueMap);
+//			queryDocFeatureValueMap.put(queryNumber, docFeatureValueMap);
 			long startTime = System.currentTimeMillis();
 
 			long endTime = System.currentTimeMillis();
@@ -115,40 +116,40 @@ public class SolrFeatureGenerator {
 		resultsTimeWriter.write(String.join("", "Average query time: ", String.valueOf(averageTime)));
 
 		// Divide into train and test sets
-		int numQueriesPerFold = 1;
-		if (queryDocFeatureValueMap.size() % searchProps.getNumFolds() == 0) {
-			numQueriesPerFold = queryDocFeatureValueMap.size() / searchProps.getNumFolds();
-		} else {
-			numQueriesPerFold = queryDocFeatureValueMap.size() / searchProps.getNumFolds() + 1;
-		}
-
-		for (int i = 0; i < searchProps.getNumFolds(); i++) {
-			int startTestNum = i * numQueriesPerFold;
-			int stopTestNum = startTestNum + numQueriesPerFold;
-			String trainFV = String.join("", searchProps.getResultsFileName(), "_trainfv", String.valueOf(i), ".txt");
-			BufferedWriter trainFVWriter = new BufferedWriter(new FileWriter(trainFV));
-			String testFV = String.join("", searchProps.getResultsFileName(), "_testfv", String.valueOf(i), ".txt");
-			BufferedWriter testFVWriter = new BufferedWriter(new FileWriter(testFV));
-			String testQueries = String.join("", searchProps.getResultsFileName(), "_testqueries", String.valueOf(i),
-					".txt");
-			BufferedWriter testQueryWriter = new BufferedWriter(new FileWriter(testQueries));
-			int numQuery = 0;
-			for (Entry<String, Map<String, Map<String, Double>>> queryValue : queryDocFeatureValueMap.entrySet()) {
-				if (numQuery >= startTestNum && numQuery < stopTestNum) {
-					String queryLine = queryTextMap.get(queryValue.getKey());
-					testQueryWriter.write(String.join("", queryLine, "\n"));
-					fvHelper.writeFeatureVectors(queryValue.getKey(), searchProps.getQrelsFileName(),
-							queryValue.getValue(), testFVWriter);
-				} else {
-					fvHelper.writeFeatureVectors(queryValue.getKey(), searchProps.getQrelsFileName(),
-							queryValue.getValue(), trainFVWriter);
-				}
-				numQuery++;
-			}
-			trainFVWriter.close();
-			testFVWriter.close();
-			testQueryWriter.close();
-		}
+//		int numQueriesPerFold = 1;
+//		if (queryDocFeatureValueMap.size() % searchProps.getNumFolds() == 0) {
+//			numQueriesPerFold = queryDocFeatureValueMap.size() / searchProps.getNumFolds();
+//		} else {
+//			numQueriesPerFold = queryDocFeatureValueMap.size() / searchProps.getNumFolds() + 1;
+//		}
+//
+//		for (int i = 0; i < searchProps.getNumFolds(); i++) {
+//			int startTestNum = i * numQueriesPerFold;
+//			int stopTestNum = startTestNum + numQueriesPerFold;
+//			String trainFV = String.join("", searchProps.getResultsFileName(), "_trainfv", String.valueOf(i), ".txt");
+//			BufferedWriter trainFVWriter = new BufferedWriter(new FileWriter(trainFV));
+//			String testFV = String.join("", searchProps.getResultsFileName(), "_testfv", String.valueOf(i), ".txt");
+//			BufferedWriter testFVWriter = new BufferedWriter(new FileWriter(testFV));
+//			String testQueries = String.join("", searchProps.getResultsFileName(), "_testqueries", String.valueOf(i),
+//					".txt");
+//			BufferedWriter testQueryWriter = new BufferedWriter(new FileWriter(testQueries));
+//			int numQuery = 0;
+//			for (Entry<String, Map<String, Map<String, Double>>> queryValue : queryDocFeatureValueMap.entrySet()) {
+//				if (numQuery >= startTestNum && numQuery < stopTestNum) {
+//					String queryLine = queryTextMap.get(queryValue.getKey());
+//					testQueryWriter.write(String.join("", queryLine, "\n"));
+//					fvHelper.writeFeatureVectors(queryValue.getKey(), searchProps.getQrelsFileName(),
+//							queryValue.getValue(), testFVWriter);
+//				} else {
+//					fvHelper.writeFeatureVectors(queryValue.getKey(), searchProps.getQrelsFileName(),
+//							queryValue.getValue(), trainFVWriter);
+//				}
+//				numQuery++;
+//			}
+//			trainFVWriter.close();
+//			testFVWriter.close();
+//			testQueryWriter.close();
+//		}
 
 		resultsFVWriter.close();
 		resultsWriter.close();

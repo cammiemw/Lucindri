@@ -1,10 +1,10 @@
 <parameters>
-        <index>C:\\dev\\Indexes_Lucene_1.0\\toy_novectors</index>
+        <index>C:\\dev\\Indexes_Lucene_1.0\\newToy</index>
         <trecFormat>true</trecFormat>
         <rule>dirichlet:2000</rule>
         <count>100</count>
   <query>
     <number> 51 </number>
-    <text>~wsum(0.9 ~and(president obama) 0.1 ~uw20(president clinton))</text>
+    <text>president</text>
   </query>
 </parameters>
